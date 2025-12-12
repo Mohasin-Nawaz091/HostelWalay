@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel App UI Prototype</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5; /* Indigo */
+            --secondary: #ec4899; /* Pink */
+            --bg-light: #f3f4f6;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --white: #ffffff;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile Container Simulation */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 850px;
+            background-color: var(--bg-light);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollable Content Area */
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px; /* Space for bottom nav/buttons */
+        }
+
+        /* Screens Management */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- UI COMPONENTS --- */
+
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        /* Search Bar */
+        .search-bar {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            width: 85%;
+        }
+        .search-bar input {
+            border: none;
+            background: transparent;
+            margin-left: 10px;
+            width: 100%;
+            outline: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--white);
+            padding: 10px;
+            gap: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            margin: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+        }
+        .card-img {
+            height: 150px;
+            background-color: #ddd;
+            position: relative;
+        }
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .verified-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .card-info {
+            padding: 12px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .rating {
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
+
+        /* Detail Screen Specifics */
+        .gallery {
+            height: 250px;
+            background: #ddd;
+        }
+        .gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .amenity-item i {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .amenity-item span {
+            font-size: 0.7rem;
+            display: block;
+        }
+
+        /* Dashboard Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+        .dash-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .dash-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* Emergency Bar */
+        .emergency-bar {
+            background: #fee2e2;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+        }
+        .emergency-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-right: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Sticky Bottom Action */
+        .bottom-action {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-full { width: 100%; }
+
+        /* Login Screen */
+        .auth-container {
+            padding: 30px;
+            text-align: center;
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .auth-tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        /* Owner Stats */
+        .stats-row {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div id="screen-home" class="screen active screen-content">
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Hostel or University...">
+                <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
+            </div>
+            <i class="fas fa-ellipsis-v" onclick="alert('Menu: About, Contact, FAQ')"></i>
+        </div>
+
+        <div style="background: linear-gradient(to right, #4f46e5, #818cf8); margin: 15px; padding: 20px; border-radius: 12px; color: white;">
+            <h3>Looking for a place?</h3>
+            <p style="font-size: 0.8rem; margin-bottom: 10px;">Join as a student or list your property.</p>
+            <button onclick="navigateTo('screen-login')" style="background: white; color: var(--primary); border: none; padding: 5px 15px; border-radius: 15px; font-size: 0.8rem;">Login / Register</button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab-btn active">Hostels</div>
+            <div class="tab-btn">Mess Providers</div>
+        </div>
+
+        <div class="feed">
+            <div class="card" onclick="navigateTo('screen-detail')">
+                <div class="card-img">
+                    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Hostel">
+                </div>
+                <div class="card-info">
+                    <div class="card-header">
+                        <h4>Sunrise Boys Hostel</h4>
+                        <div class="rating"><i class="fas fa-star"></i> 4.5 (120)</div>
+                    </div>
+                    <p style="color: var(--text-gray); font-size: 0.8rem; margin-top: 5px;">
+                        <i class="fas fa-map-pin"></i> 0.5km from University
+                    </p>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; align-items: center;">
+                        <span style="font-weight: bold; color: var(--text-dark);">Rs. 12,000<span style="font-size:0.7rem; font-weight:400">/mo</span></span>
+                        <i class="far fa-heart" style="color: var(--secondary);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-img">
+                    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    <img src="https://images.unsplash.com/photo-1596276020587-8044fe049813?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Hostel">
+                </div>
+                <div class="card-info">
+                    <div class="card-header">
+                        <h4>Green Valley Girls Hostel</h4>
+                        <div class="rating"><i class="fas fa-star"></i> 4.8 (200)</div>
+                    </div>
+                    <p style="color: var(--text-gray); font-size: 0.8rem; margin-top: 5px;">
+                        <i class="fas fa-map-pin"></i> 1.2km from University
+                    </p>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; align-items: center;">
+                        <span style="font-weight: bold; color: var(--text-dark);">Rs. 14,000<span style="font-size:0.7rem; font-weight:400">/mo</span></span>
+                        <i class="far fa-heart" style="color: var(--secondary);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-detail" class="screen screen-content">
+        <div class="gallery">
+            <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                <button onclick="navigateTo('screen-home')" style="background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px; border-radius: 50%; width: 35px; height: 35px;"><i class="fas fa-arrow-left"></i></button>
+            </div>
+            <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Room">
+        </div>
+
+        <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Sunrise Boys Hostel</h2>
+                <span style="color: var(--success); font-size: 0.8rem; background: #d1fae5; padding: 4px 8px; border-radius: 4px;">Verified</span>
+            </div>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 5px;">Peshawar University Road, Opp. KFC.</p>
+
+            <h4 style="margin-top: 20px;">Amenities</h4>
+            <div class="amenities-grid">
+                <div class="amenity-item"><i class="fas fa-wifi"></i><span>Wi-Fi</span></div>
+                <div class="amenity-item"><i class="fas fa-bolt"></i><span>Generator</span></div>
+                <div class="amenity-item"><i class="fas fa-utensils"></i><span>Mess</span></div>
+                <div class="amenity-item"><i class="fas fa-snowflake"></i><span>AC</span></div>
+            </div>
+
+            <h4 style="margin-top: 10px;">House Rules</h4>
+            <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-gray); margin-top: 5px;">
+                <li>Gate closes at 10:00 PM</li>
+                <li>No loud music after 11:00 PM</li>
+                <li>Guests allowed in lobby only</li>
+            </ul>
+
+            <h4 style="margin-top: 20px;">Reviews</h4>
+            <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 30px; height: 30px; background: #ccc; border-radius: 50%;"></div>
+                    <strong>Ali Khan</strong>
+                    <div class="rating"><i class="fas fa-star"></i> 5.0</div>
+                </div>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Clean rooms and good food. Recommended!</p>
+            </div>
+        </div>
+
+        <div class="bottom-action">
+            <button class="btn btn-outline">Book Visit</button>
+            <button class="btn btn-primary" onclick="navigateTo('screen-login')">Book Me</button>
+        </div>
+    </div>
+
+    <div id="screen-login" class="screen screen-content">
+        <div style="padding: 20px;">
+            <button onclick="navigateTo('screen-home')" style="border: none; background: transparent; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="auth-container">
+            <h2>Welcome Back</h2>
+            <p style="color: var(--text-gray); margin-bottom: 20px;">Login to continue booking</p>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-student" onclick="toggleLoginType('student')">Student Login</div>
+                <div class="auth-tab" id="tab-owner" onclick="toggleLoginType('owner')">Owner Login</div>
+            </div>
+
+            <div class="input-group">
+                <label>Email or Phone</label>
+                <input type="text" placeholder="user@example.com">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="********">
+            </div>
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="#" style="font-size: 0.8rem; color: var(--primary);">Forgot Password?</a>
+            </div>
+
+            <button class="btn btn-primary btn-full" onclick="handleLogin()">Login</button>
+            
+            <div style="margin-top: 20px; font-size: 0.9rem;">
+                Don't have an account? <span style="color: var(--primary); font-weight: bold;">Register</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-dashboard-student" class="screen screen-content">
+        <div class="header">
+            <div>
+                <h3 style="color: var(--primary);">Welcome Home, Ahmed</h3>
+                <p style="font-size: 0.8rem; color: var(--text-gray);">Sunrise Boys Hostel - Room 102</p>
+            </div>
+            <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+
+        <div style="margin: 15px; padding: 15px; background: white; border-radius: 12px; border-left: 5px solid var(--primary);">
+            <h5><i class="far fa-clock"></i> Digital Attendance</h5>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <input type="time" style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
+                <button style="background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px;">I'll be back</button>
+            </div>
+        </div>
+
+        <div class="dash-grid">
+            <div class="dash-card">
+                <i class="fas fa-utensils"></i>
+                <h4>Mess Menu</h4>
+                <p style="font-size: 0.7rem; color: var(--text-gray);">Lunch: Biryani</p>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-exclamation-circle"></i>
+                <h4>Complaint</h4>
+                <p style="font-size: 0.7rem; color: var(--text-gray);">Report Issues</p>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-bed"></i>
+                <h4>My Room</h4>
+                <p style="font-size: 0.7rem; color: var(--text-gray);">Rent Paid</p>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-bullhorn"></i>
+                <h4>Notices</h4>
+                <p style="font-size: 0.7rem; color: var(--text-gray);">2 New</p>
+            </div>
+        </div>
+
+        <div class="emergency-bar">
+            <h5 style="color: var(--danger); margin-bottom: 10px;"><i class="fas fa-ambulance"></i> Emergency Red Zone</h5>
+            <div style="display: flex; overflow-x: auto;">
+                <button class="emergency-btn">Warden</button>
+                <button class="emergency-btn">Police</button>
+                <button class="emergency-btn">Parents</button>
+            </div>
+        </div>
+
+        <div style="padding: 20px;">
+            <button class="btn btn-outline btn-full" onclick="navigateTo('screen-home')">Logout (Demo)</button>
+        </div>
+    </div>
+
+    <div id="screen-dashboard-owner" class="screen screen-content">
+        <div class="header" style="background: #1f2937; color: white;">
+            <div>
+                <h3>Owner Command Center</h3>
+                <p style="font-size: 0.8rem; opacity: 0.8;">Sunrise Hostel Admin</p>
+            </div>
+            <i class="fas fa-cog"></i>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">45/50</div>
+                <div style="font-size: 0.8rem; color: var(--text-gray);">Beds Occupied</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div style="font-size: 0.8rem; color: var(--text-gray);">New Views</div>
+            </div>
+        </div>
+
+        <h4 style="padding: 0 15px; margin-top: 10px;">Booking Requests</h4>
+        <div style="margin: 15px; background: white; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>Kamran Ali</strong>
+                <p style="font-size: 0.8rem; color: var(--text-gray);">Request for Shared Room</p>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <button style="background: var(--success); color: white; border: none; width: 30px; height: 30px; border-radius: 50%;"><i class="fas fa-check"></i></button>
+                <button style="background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%;"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <h4 style="padding: 0 15px; margin-top: 10px;">Management</h4>
+        <div class="dash-grid">
+            <div class="dash-card">
+                <i class="fas fa-layer-group" style="color: #1f2937"></i>
+                <h4>Floors</h4>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-users-cog" style="color: #1f2937"></i>
+                <h4>Staff</h4>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-utensils" style="color: #1f2937"></i>
+                <h4>Update Mess</h4>
+            </div>
+            <div class="dash-card">
+                <i class="fas fa-ad" style="color: #1f2937"></i>
+                <h4>Boost Ad</h4>
+            </div>
+        </div>
+
+         <div style="padding: 20px;">
+            <button class="btn btn-outline btn-full" onclick="navigateTo('screen-home')">Logout (Demo)</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Simple Router Logic
+    function navigateTo(screenId) {
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        // Show target screen
+        document.getElementById(screenId).classList.add('active');
+        
+        // Scroll to top
+        document.querySelector('.app-container').scrollTo(0,0);
+    }
+
+    // Login Type Toggle
+    let currentLoginType = 'student';
+
+    function toggleLoginType(type) {
+        currentLoginType = type;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + type).classList.add('active');
+    }
+
+    // Handle Login Button Click
+    function handleLogin() {
+        if (currentLoginType === 'student') {
+            navigateTo('screen-dashboard-student');
+        } else {
+            navigateTo('screen-dashboard-owner');
+        }
+    }
+</script>
+
+</body>
+</html>
